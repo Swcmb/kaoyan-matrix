@@ -97,6 +97,11 @@ def _expand_frac(text: str) -> str:
     return text
 
 
+def _filter(text: str) -> str:
+    """只留字母数字（含 CJK、希腊字母）与映射表产出过的符号，并转小写。"""
+    return ''.join(ch for ch in text if ch.isalnum() or ch in KEEP_SYMBOLS).lower()
+
+
 def normalize(text: str) -> str:
     t = unicodedata.normalize('NFKC', text or '')
     t = _expand_frac(t)
@@ -104,5 +109,13 @@ def normalize(text: str) -> str:
     t = _RE_MACRO.sub(lambda m: MACROS.get(m.group(1), ''), t)
     t = _RE_BACKSLASH.sub('', t)
     t = t.replace('{', '').replace('}', '')
-    kept = [ch for ch in t if ch.isalnum() or ch in KEEP_SYMBOLS]
-    return ''.join(kept).lower()
+    t = _filter(t)
+    # 迭代到不动点。NFKC 会进一步分解一部分符号：∬→∫∫、∭→∫∫∫、…→...、′→'，
+    # 一次归一化后仍是"可再分解"的形态。语料里存 ∭ 而用户手打 ∫∫∫ 时，
+    # 不做到不动点就永远无法精确包含，三重积分这类题目会漏命中。
+    for _ in range(4):
+        nxt = _filter(unicodedata.normalize('NFKC', t))
+        if nxt == t:
+            break
+        t = nxt
+    return t

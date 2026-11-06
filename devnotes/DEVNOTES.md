@@ -8,7 +8,7 @@
 - 依赖：`mcp>=2.2,<3` + Python 标准库（`urllib` / `re` / `json` / `difflib` / `unicodedata` / `concurrent.futures`）
 - 安装命令：`pip install "mcp>=2.2,<3"`；测试另需 `pytest`
 - 启动命令：`python server.py`（stdio）
-- 数据目录：`./.cache/index.json`（约 1.1 MB，gitignore）
+- 数据目录：`<代码所在目录>/.cache/index.json`（约 1.1 MB，gitignore）。`index.py` 用模块自身的 `BASE_DIR` 定位，与启动时的当前工作目录无关
 - 前置条件：首次建库需能访问 `mathabc.xyz`；之后离线
 - 本机的 agent harness 同步副本（内部，仅本机路径，对外读者可忽略）：`D:/ai-configs/mcp/kaoyan-matrix/`，登记于 `D:/ai-configs/mcp/kaoyan-matrix.json`
 
@@ -16,7 +16,7 @@
 
 | 变量 | 用途 | 本地来源 | 是否必需 |
 |---|---|---|---|
-| `KAOYAN_MATRIX_CACHE` | 覆盖索引缓存路径 | 默认 `./.cache/index.json` | 否 |
+| `KAOYAN_MATRIX_CACHE` | 覆盖索引缓存路径 | 默认 `<代码所在目录>/.cache/index.json` | 否 |
 
 无凭据依赖：站点全部页面公开可读，无需 token、cookie 或账号。
 

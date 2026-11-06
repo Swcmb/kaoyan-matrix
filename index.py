@@ -17,7 +17,7 @@ __all__ = ["BuildError", "cache_path", "load", "refresh", "PARSER_VERSION", "TTL
 
 BASE_DIR = Path(__file__).resolve().parent
 CACHE_DIR = BASE_DIR / '.cache'
-PARSER_VERSION = '1'
+PARSER_VERSION = '2'  # 归一化改为迭代到不动点后递增，旧缓存自动失效
 TTL_DAYS = 7
 MAX_WORKERS = 8
 DRIFT_LIMIT = 0.20

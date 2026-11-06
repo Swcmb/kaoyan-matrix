@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """归一化层测试：同义写法必须折叠成同一字符串。"""
+import pathlib
+
 import pytest
 
 from normalize import normalize
@@ -48,8 +50,40 @@ def test_lowercase_fold():
     assert normalize("X") == normalize("x")
 
 
-def test_real_stem_matches_plain_rewriting():
-    """站点原文题干（带 LaTeX）与手打无公式版本必须归一化到同一前缀。"""
-    site = r"设随机变量 $\mathrm{X}, \mathrm{Y}$ 相互独立，且均服从参数为 $\lambda$ 的指数分布"
-    hand = "设随机变量 X, Y 相互独立，且均服从参数为 λ 的指数分布"
-    assert normalize(site) == normalize(hand)
+def test_latex_form_matches_plain_form_selfauthored():
+    """自造文本：LaTeX 写法与手打纯文本必须归一化到同一串。
+
+    不用站点真题做断言——测试文件不保存题干原文；真实题干的等价性由下面
+    那条幂等性测试在运行时用索引验证。
+    """
+    latex = r"曲线 $y=\sin x$ 在点 $(0,0)$ 处的切线斜率为 $\frac{1}{2}$"
+    hand = "曲线 y=sinx 在点 (0,0) 处的切线斜率为 12"
+    assert normalize(latex) == normalize(hand)
+
+
+def test_normalize_is_idempotent_on_selfauthored_text():
+    assert normalize(normalize(r"$\alpha+\beta=\gamma$")) == normalize(r"\alpha\beta\gamma")
+
+
+@pytest.mark.skipif(not (pathlib.Path(__file__).resolve().parent.parent
+                         / '.cache' / 'index.json').exists(),
+                    reason='需要先构建索引')
+def test_plain_rewriting_of_real_stems_is_equivalent():
+    """手打形态能命中原文的根因：把行内公式就地归一化后整体再归一化，结果不变。
+
+    题干运行时从索引读取，本文件不保存任何站点原文。
+    """
+    import re
+    import index
+    span = re.compile(r'\$[^$]*\$')
+    records = index.load(auto_refresh=False)['records']
+    checked = 0
+    for r in records:
+        if not r['stem'] or '  ' in r['stem']:
+            continue
+        plain = span.sub(lambda m: normalize(m.group(0)), r['stem'])
+        assert normalize(plain) == normalize(r['stem']), r['detail_url']
+        checked += 1
+        if checked >= 200:
+            break
+    assert checked == 200
