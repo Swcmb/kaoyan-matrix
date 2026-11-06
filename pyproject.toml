@@ -1,0 +1,10 @@
+[project]
+name = "kaoyan-matrix"
+version = "0.1.0"
+description = "考研数学真题定位 MCP：给题干，返回年份/科目/题号"
+requires-python = ">=3.11"
+license = "GPL-3.0-or-later"
+dependencies = ["mcp>=2.2,<3"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
