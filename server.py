@@ -77,8 +77,9 @@ def find_problem(stem: str, subject: str | None = None, year: int | None = None,
         top_k: 返回候选条数，1-10，默认 3。分数并列的同题跨卷结果会一并返回。
 
     Returns:
-        verdict 一句话结论；hits 候选列表，每项含 year/subject/num/type/score/url/
-        match/confidence/stem_preview；index 缓存元数据；reason 判定状态。
+        verdict 一句话结论；reason 判定状态；query_len 归一化后查询长度；
+        hits 候选列表，每项含 year/subject/num/type/score/url/match/
+        confidence/ratio/stem_preview；index 缓存元数据。
     """
     if not (stem or '').strip():
         raise ToolError('stem 不能为空：请粘贴或输入考研数学题干文本')
